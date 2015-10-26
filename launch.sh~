@@ -23,7 +23,8 @@ for i in {0..25}; do echo -ne '.'; sleep 1;done
 
 aws elb register-instances-with-load-balancer --load-balancer-name $8 --instances ${instanceIDARR[@]}
 
-aws elb configure-health-check --load-balancer-name $8 --health-check Target=HTTP:80/ index.html,Interval=30,UnhealthyThreshold=2,HealthyThreshold=2,Timeout=3
+aws elb configure-health-check --load-balancer-name $8 --health-check 
+Target=HTTP:80/index.html,Interval=30,UnhealthyThreshold=2,HealthyThreshold=2,Timeout=3
 
 echo -e "\nWaiting an additional 180 sec - before opening the load balancer in a web browser"
 for i in {0..180}; do echo -ne '.'; sleep 1;done
