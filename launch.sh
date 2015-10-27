@@ -31,3 +31,6 @@ for i in {0..180}; do echo -ne '.'; sleep 1;done
 
 #Create Launch Configuration
 aws autoscaling create-launch-configuration --launch-configuration-name $9 --image-id ami-$1 --instance-type $3 --key-name $4 --security-groups $5 --iam-instance-profile $7 --user-data file://~/Documents/ITMO-544-A20344475-Enviornment-Setup/install-env.sh
+
+#Create Auto Scaling
+aws autoscaling create-auto-scaling-group --auto-scaling-group name $10 --launch-configuration-name $9 --load-balancer-names $8 --health-check-type ELB --min-size 1 --max-size 3 --desired-capacity 2 --default-cooldown 600 --healthcheck-grace-period 120 --vpc-zone-identifier $6
