@@ -34,3 +34,8 @@ aws autoscaling create-launch-configuration --launch-configuration-name $9 --ima
 
 #Create Auto Scaling
 aws autoscaling create-auto-scaling-group --auto-scaling-group name $10 --launch-configuration-name $9 --load-balancer-names $8 --health-check-type ELB --min-size 1 --max-size 3 --desired-capacity 2 --default-cooldown 600 --healthcheck-grace-period 120 --vpc-zone-identifier $6
+
+#Open Browser
+#firefox $ELBURL &
+chromium-browser $ELBURL &
+export ELBURL 
