@@ -7,7 +7,8 @@ declare -a instanceIDARR
 declare -a autoscaleARNARR
 
 #Create db subnet 
-aws rds create-db-subnet-group --db-subnet-group-name jaysharmadb-subnet --db-subnet-group-description "Default Db Subnet" --subnet-ids subnet-290d195e subnet-285f7171
+aws rds create-db-subnet-group --db-subnet-group-name jaysharmadb-subnet --db-subnet-group-description "Default Db Subnet" --subnet-ids subnet-290d195e subnet-285f7171 --output table | grep DBSubnetGroupName | sed "s/|//g" | tr -d ' ' | sed "s/DBSubnetGroupName//g"
+
 
 #Create RDS Db instance
 aws rds create-db-instance --db-instance-identifier jaysharma-rds --allocated-storage 5 --db-instance-class db.t1.micro --engine mysql --master-username JaySharma --master-user-password sharma1234 --vpc-security-group-ids sg-56ebff31 --db-subnet-group-name jaysharmadb-subnet --db-name datadb 
@@ -31,7 +32,7 @@ aws ec2 wait instance-running --instance-ids ${instanceIDARR[@]}
 echo "Instances are Running"
 
 #Load Balancer
-ELBURL=(`aws elb create-load-balancer --load-balancer-name $8 --listeners Protocol=HTTP,LoadBalancerPort=80,InstanceProtocol=HTTP,InstancePort=80 --subnets $6 --security-groups $5 --output=text`); echo $ELBURL
+ELBURL=(`aws elb create-load-balancer --load-balancer-name jaysharma-elb --listeners Protocol=HTTP,LoadBalancerPort=80,InstanceProtocol=HTTP,InstancePort=80 --subnets $6 --security-groups $5 --output=text`); echo $ELBURL
 echo -e "\nFinished launching ELB and sleeping 25 seconds"
 for i in {0..25}; do echo -ne '.'; sleep 1;done
 
