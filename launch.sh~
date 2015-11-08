@@ -46,13 +46,13 @@ aws autoscaling create-launch-configuration --launch-configuration-name jaysharm
 #Create Auto Scaling
 mapfile -t autoscaleARNARR < <(aws autoscaling create-auto-scaling-group --auto-scaling-group-name jaysharma-autoscale --launch-configuration-name jaysharma-lcong --load-balancer-names jaysharma-elb --health-check-type ELB --min-size 1 --max-size 3 --desired-capacity 2 --default-cooldown 600 --health-check-grace-period 120 --vpc-zone-identifier $6 --output table | grep AutoScalingGroupARN | sed "s/|//g" | tr -d ' ' | sed "s/AutoScalingGroupARN//g")
 
-echo ${instanceIDARR[@]}
+echo ${autoscaleARNARR[@]}
 
 #Create cloud watch for 30 threshold
-aws cloudwatch put-metric-alarm --alarm-name JaySharma-alarm --metric-name CPUUtilization --namespace AWS/ELB --statistic Average --period 300 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold  --dimensions  Name=AutoScaling,Value=jaysharma-autoscale --evaluation-periods 2 --alarm-actions ${instanceIDARR[@]} --unit Percent
+aws cloudwatch put-metric-alarm --alarm-name JaySharma-alarm --metric-name CPUUtilization --namespace AWS/ELB --statistic Average --period 300 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold  --dimensions  Name=AutoScaling,Value=jaysharma-autoscale --evaluation-periods 2 --alarm-actions ${autoscaleARNARR[@]} --unit Percent
 
 #Create cloud watch for 10 threshold
-aws cloudwatch put-metric-alarm --alarm-name JaySharma-alarm1 --metric-name CPUUtilization --namespace AWS/ELB --statistic Average --period 300 --threshold 10 --comparison-operator LessThanOrEqualToThreshold  --dimensions  Name=AutoScaling,Value=jaysharma-autoscale --evaluation-periods 2 --alarm-actions ${instanceIDARR[@]} --unit Percent
+aws cloudwatch put-metric-alarm --alarm-name JaySharma-alarm1 --metric-name CPUUtilization --namespace AWS/ELB --statistic Average --period 300 --threshold 10 --comparison-operator LessThanOrEqualToThreshold  --dimensions  Name=AutoScaling,Value=jaysharma-autoscale --evaluation-periods 2 --alarm-actions ${autoscaleARNARR[@]} --unit Percent
 
 
 #Open Browser
