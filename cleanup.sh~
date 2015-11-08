@@ -25,9 +25,6 @@ for (( i=0; i<${LENGTH}; i++));
   sleep 1
 done
 
-#Delete db subnet
-aws rds delete-db-subnet-group --db-subnet-group-name JaySharmaDb-Subnet
-echo "Deleting db subnet"
 
 # Delete existing RDS  Databases
 # Note if deleting a read replica this is not your command 
@@ -47,6 +44,11 @@ if [ ${#dbInstanceARR[@]} -gt 0 ]
    done
 fi
 
+#Delete db subnet
+aws rds delete-db-subnet-group --db-subnet-group-name jaySharmadb-Subnet
+echo "Deleting db subnet"
+
+
 # Create Launchconf and Autoscaling groups
 
 LAUNCHCONF=(`aws autoscaling describe-launch-configurations --output json | grep LaunchConfigurationName | sed "s/[\"\:\, ]//g" | sed "s/LaunchConfigurationName//g"`)
@@ -59,16 +61,15 @@ echo "the number is: " ${#SCALENAME[@]}
 if [ ${#SCALENAME[@]} -gt 0 ]
   then
 echo "SCALING GROUPS to delete..."
-aws autoscaling detach-launch-
+#aws autoscaling detach-launch-
 
-aws autoscaling delete-auto-scaling-group --auto-scaling-group-name $SCALENAME
+#aws autoscaling delete-auto-scaling-group --auto-scaling-group-name $SCALENAME
 
-aws autoscaling delete-launch-configuration --launch-configuration-name $LAUNCHCONF
+#aws autoscaling delete-launch-configuration --launch-configuration-name $LAUNCHCONF
+#aws autoscaling update-auto-scaling-group --auto-scaling-group-name $SCALENAME --min-size 0 --max-size 0
 
-aws autoscaling update-auto-scaling-group --auto-scaling-group-name $SCALENAME --min-size 0 --max-size 0
-
-aws autoscaling delete-auto-scaling-group --auto-scaling-group-name $SCALENAME
-aws autoscaling delete-launch-configuration --launch-configuration-name $LAUNCHCONF
+#aws autoscaling delete-auto-scaling-group --auto-scaling-group-name $SCALENAME
+#aws autoscaling delete-launch-configuration --launch-configuration-name $LAUNCHCONF
 fi
 
 echo "All done"
