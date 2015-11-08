@@ -6,10 +6,6 @@
 declare -a instanceIDARR
 declare -a autoscaleARNARR
 
-#Create db subnet 
-aws rds create-db-subnet-group --db-subnet-group-name jaysharmadb-subnet --db-subnet-group-description "Default Db Subnet" --subnet-ids subnet-290d195e subnet-285f7171 --output table | grep DBSubnetGroupName | sed "s/|//g" | tr -d ' ' | sed "s/DBSubnetGroupName//g"
-
-
 #Create RDS Db instance
 aws rds create-db-instance --db-instance-identifier jaysharma-rds --allocated-storage 5 --db-instance-class db.t1.micro --engine mysql --master-username JaySharma --master-user-password sharma1234 --vpc-security-group-ids sg-56ebff31 --db-subnet-group-name jaysharmadb-subnet --db-name datadb 
 
@@ -18,7 +14,7 @@ aws rds wait db-instance-available --db-instance-identifier JaySharma-RDS
 echo "db instance is created"
 
 #Create Read Replica
-aws rds create-db-instance-read-replica --db-instance-identifier jaysharma-readreplica --source-db-instance-identifier jaysharma-rds --db-subnet-group-name jaysharmadb-subnet
+aws rds create-db-instance-read-replica --db-instance-identifier jaysharma-readreplica --source-db-instance-identifier jaysharma-rds
 
 
 #Launch instance

@@ -44,10 +44,6 @@ if [ ${#dbInstanceARR[@]} -gt 0 ]
    done
 fi
 
-#Delete db subnet
-aws rds delete-db-subnet-group --db-subnet-group-name jaySharmadb-Subnet
-echo "Deleting db subnet"
-
 
 # Create Launchconf and Autoscaling groups
 
