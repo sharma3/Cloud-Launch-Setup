@@ -56,7 +56,7 @@ echo $topicArn
 
 aws sns set-topic-attributes --topic-arn $topicArn --attribute-name SNS-matricWatch
 
-aws sns subscribe --topic-arn $topicArn --protocol sms --notification-endpoint $8
+aws sns subscribe --topic-arn $topicArn --protocol email --notification-endpoint $8
 
 aws autoscaling put-notification-configuration --auto-scaling-group-name jaysharma-autoscale --topic-arn $topicArn --notification-types autoscaling:EC2_LAUNCH
 
