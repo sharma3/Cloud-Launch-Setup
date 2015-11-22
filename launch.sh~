@@ -54,22 +54,23 @@ echo ${autoscaleARNARR[@]}
 #CloudWatch Alarm for SNS
  
 topicArn=(`aws sns create-topic --name snsCloudWatch`)
-aws sns set-topic-attributes --topic-arn $topicArn --attribute-name SNS-matricWatch
+aws sns set-topic-attributes --topic-arn $topicArn --attribute-name DisplayName --attribute-value SNS-matricWatch
 aws sns subscribe --topic-arn $topicArn --protocol email --notification-endpoint $8
 
-aws autoscaling put-notification-configuration --auto-scaling-group-name jaysharma-autoscale --topic-arn $topicArn --notification-types autoscaling:EC2_LAUNCH
+aws autoscaling put-notification-configuration --auto-scaling-group-name jaysharma-autoscale --topic-arn $topicArn --notification-types autoscaling:EC2_INSTANCE_LAUNCH
 
-aws autoscaling put-notification-configuration --auto-scaling-group-name jaysharma-autoscale --topic-arn $topicArn --notification-types autoscaling:EC2_TERMINATE
+aws autoscaling put-notification-configuration --auto-scaling-group-name jaysharma-autoscale --topic-arn $topicArn --notification-types autoscaling:EC2_INSTANCE_TERMINATE
 
-aws cloudwatch put-metric-alarm --alarm-name UPSNS --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $topicArn
+aws cloudwatch put-metric-alarm --alarm-name UPSNS --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold --evaluation-periods 1 --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $topicArn
 
 
-aws cloudwatch put-metric-alarm --alarm-name DOWNSNS --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 10 --comparison-operator LessThanOrEqualToThreshold --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $topicArn
+aws cloudwatch put-metric-alarm --alarm-name DOWNSNS --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 10 --comparison-operator LessThanOrEqualToThreshold --evaluation-periods 1 --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $topicArn
 
 
 #CloudWatch Alarm for SNS
 snsArn=(`aws sns create-topic --name $9`)
-aws sns set-topic-attributes --topic-arn $snsArn --attribute-name $9
+aws sns set-topic-attributes --topic-arn $snsArn --attribute-name DisplayName --attribute-value $9
+
 
 #Create cloud watch for 30 threshold
 aws cloudwatch put-metric-alarm --alarm-name JaySharma-alarm --metric-name CPUUtilization --namespace AWS/ELB --statistic Average --period 300 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold  --dimensions  Name=AutoScaling,Value=jaysharma-autoscale --evaluation-periods 2 --alarm-actions ${autoscaleARNARR[@]} --unit Percent
@@ -79,7 +80,7 @@ aws cloudwatch put-metric-alarm --alarm-name JaySharma-alarm1 --metric-name CPUU
 
 
 #Connect to the database and create a table
-cat << EOF | mysql -h $ENDPOINT -P 3306 -u JaySharma -p sharma1234 datadb
+cat << EOF | mysql -h $ENDPOINT -P 3306 -u JaySharma -psharma1234 datadb
 CREATE TABLE IF NOT EXISTS snstopic(snsid INT NOT NULL AUTO_INCREMENT, snsName VARCHAR(50) NOT NULL, snsArn VARCHAR(255) NOT NULL, PRIMARY KEY(snsid));
 INSERT INTO snsTopic (snsName,snsArn) VALUES ('$9','$snsArn');
 
