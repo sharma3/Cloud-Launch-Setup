@@ -62,7 +62,7 @@ aws autoscaling put-notification-configuration --auto-scaling-group-name jayshar
 
 aws autoscaling put-notification-configuration --auto-scaling-group-name jaysharma-autoscale --topic-arn $topicArn --notification-types autoscaling:EC2_TERMINATE
 
-aws cloudwatch put-metric-alarm --alarm-name UPSNS --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold --evaluation-periods 1 --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $TopicArn
+aws cloudwatch put-metric-alarm --alarm-name UPSNS --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold --evaluation-periods 1 --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $topicArn
 
 
 aws cloudwatch put-metric-alarm --alarm-name DOWNSNS --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 10 --comparison-operator LessThanOrEqualToThreshold  --evaluation-periods 1 --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $topicArn
