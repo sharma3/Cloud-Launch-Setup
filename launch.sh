@@ -48,6 +48,27 @@ mapfile -t autoscaleARNARR < <(aws autoscaling create-auto-scaling-group --auto-
 
 echo ${autoscaleARNARR[@]}
 
+#CloudWatch Alarm for SNS
+ 
+topicArn= ('aws sns create-topic --name snsCloudWatch')
+
+echo $topicArn
+
+aws sns set-topic-attributes --topic-arn $topicArn --attribute-name SNS-matricWatch
+
+aws sns subscribe --topic-arn $topicArn --protocol sms --notification-endpoint $8
+
+aws autoscaling put-notification-configuration --auto-scaling-group-name jaysharma-autoscale --topic-arn $topicArn --notification-types autoscaling:EC2_LAUNCH
+
+aws autoscaling put-notification-configuration --auto-scaling-group-name jaysharma-autoscale --topic-arn $topicArn --notification-types autoscaling:EC2_TERMINATE
+
+aws cloudwatch put-metric-alarm --alarm-name UPSNS --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold --evaluation-periods 1 --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $TopicArn
+
+
+aws cloudwatch put-metric-alarm --alarm-name DOWNSNS --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 10 --comparison-operator LessThanOrEqualToThreshold  --evaluation-periods 1 --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $topicArn
+
+
+
 #Create cloud watch for 30 threshold
 aws cloudwatch put-metric-alarm --alarm-name JaySharma-alarm --metric-name CPUUtilization --namespace AWS/ELB --statistic Average --period 300 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold  --dimensions  Name=AutoScaling,Value=jaysharma-autoscale --evaluation-periods 2 --alarm-actions ${autoscaleARNARR[@]} --unit Percent
 
