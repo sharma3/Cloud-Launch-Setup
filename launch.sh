@@ -50,7 +50,7 @@ echo ${autoscaleARNARR[@]}
 
 #CloudWatch Alarm for SNS
  
-topicArn = (`aws sns create-topic --name snsCloudWatch`)
+topicArn=(`aws sns create-topic --name snsCloudWatch`);
 
 echo $topicArn
 
