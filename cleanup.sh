@@ -59,7 +59,7 @@ echo "ARRAY LENGTH IS $LENGTH"
 for (( i=0; i<${LENGTH}; i++)); 
   do
   aws elb delete-load-balancer --load-balancer-name ${cleanupLBARR[i]} --output text
-	echo "detaching load balancer from autoscaling"
+  echo "detaching load balancer from autoscaling"
   aws autoscaling detach-load-balancers --load-balancer-names ${cleanupLBARR[i]} --auto-scaling-group-name ${SCALENAME[@]}
   sleep 1
 done
