@@ -51,6 +51,9 @@ mapfile -t autoscaleARNARR < <(aws autoscaling create-auto-scaling-group --auto-
 
 echo ${autoscaleARNARR[@]}
 
+#Create cookie stickiness policy
+aws elb create-lb-cookie-stickiness-policy --load-balancer-name jaysharma-elb --policy-name my-duration-cookie-policy --cookie-expiration-period 60
+
 #CloudWatch Alarm for SNS
  
 topicArn=(`aws sns create-topic --name snsCloudWatch`)
@@ -73,14 +76,15 @@ aws sns set-topic-attributes --topic-arn $snsArn --attribute-name DisplayName --
 
 
 #Create cloud watch for 30 threshold
-aws cloudwatch put-metric-alarm --alarm-name JaySharma-alarm --metric-name CPUUtilization --namespace AWS/ELB --statistic Average --period 300 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold  --dimensions  Name=AutoScaling,Value=jaysharma-autoscale --evaluation-periods 2 --alarm-actions ${autoscaleARNARR[@]} --unit Percent
+SCALEUP=(`aws autoscaling put-scaling-policy --policy-name WATCHUP --auto-scaling-group-name jaysharma-autoscale --scaling-adjustment 1 --adjustment-type ChangeInCapacity`)
+aws cloudwatch put-metric-alarm --alarm-name UPMATRICK --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 30 --comparison-operator GreaterThanOrEqualToThreshold --evaluation-periods 1 --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $SCALEUP
 
 #Create cloud watch for 10 threshold
-aws cloudwatch put-metric-alarm --alarm-name JaySharma-alarm1 --metric-name CPUUtilization --namespace AWS/ELB --statistic Average --period 300 --threshold 10 --comparison-operator LessThanOrEqualToThreshold  --dimensions  Name=AutoScaling,Value=jaysharma-autoscale --evaluation-periods 2 --alarm-actions ${autoscaleARNARR[@]} --unit Percent
-
+SCALEDOWN=(`aws autoscaling put-scaling-policy --policy-name WATCHDOWN --auto-scaling-group-name jaysharma-autoscale --scaling-adjustment -1 --adjustment-type ChangeInCapacity`)
+aws cloudwatch put-metric-alarm --alarm-name DOWNMATRICK --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period 120 --threshold 10 --comparison-operator LessThanOrEqualToThreshold  --evaluation-periods 1 --dimensions "Name=AutoScalingGroupName,Value=jaysharma-autoscale" --unit Percent --alarm-actions $SCALEDOWN
 
 #Connect to the database and create a table
-cat << EOF | mysql -h $ENDPOINT -P 3306 -u JaySharma -psharma1234 datadb
+cat << EOF|mysql -h $ENDPOINT -P 3306 -u JaySharma -psharma1234 datadb
 CREATE TABLE IF NOT EXISTS snstopic(snsid INT NOT NULL AUTO_INCREMENT, snsName VARCHAR(50) NOT NULL, snsArn VARCHAR(255) NOT NULL, PRIMARY KEY(snsid));
 INSERT INTO snsTopic (snsName,snsArn) VALUES ('$9','$snsArn');
 
